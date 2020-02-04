@@ -58,8 +58,6 @@ https://spring.io/guides/gs/gateway/#scratch
 4. Add the following to your application.yml:
 
 ```yml
-server.port: 8080 # port you want it to run on
-
 spring:
   cloud:
     gateway:
@@ -72,3 +70,19 @@ spring:
             - AddResponseHeader=Access-Control-Allow-Origin, * # any headers
 ```
 
+5. For a local profile, create an application-local.yml
+
+```yml
+server.port: 8080 # port you want this to run on
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: dog
+          uri: http://localhost:8081
+          predicates:
+            - Path=/dog/**
+          filters:
+            - AddResponseHeader=Access-Control-Allow-Origin, *
+```

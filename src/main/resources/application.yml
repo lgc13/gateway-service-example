@@ -1,11 +1,9 @@
-server.port: 8080
-
 spring:
   cloud:
     gateway:
       routes:
         - id: dog
-          uri: https://dog-spring-service.herokuapp.com/ # TODO: need to change
+          uri: https://dog-spring-service.herokuapp.com/
           predicates:
             - Path=/dog/**
           filters:
