@@ -123,6 +123,8 @@ public class GatewayServiceExampleApplication {
 
 4. If you want a filter (and see logs), add the following:
 
+(more notes here: https://spring.io/guides/gs/routing-and-filtering/)
+
 ```java
 // SimpleFilter.java file
 
