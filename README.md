@@ -1,5 +1,7 @@
 # Gateway service example
 
+### Using spring.cloud.gateway
+
 1. Start a Spring boot app project:
 
 2. Add these dependencies:
@@ -86,3 +88,111 @@ spring:
           filters:
             - AddResponseHeader=Access-Control-Allow-Origin, *
 ```
+
+### Using zuul
+
+1. Add the dependency:
+
+```
+# build.gradle file
+implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul:2.2.1.RELEASE'
+```
+
+2. Add any configuration
+
+```yml
+zuul:
+  routes:
+    dog:
+      path: /api/dog/**   # where requests are made to
+      url: http://localhost:8081/dog  # where requests will be routed to
+```
+
+3. Add the annotation to your main class:
+
+```java
+@EnableZuulProxy
+@SpringBootApplication
+public class GatewayServiceExampleApplication {
+
+	public static void main(String[] args) {
+    		SpringApplication.run(GatewayServiceExampleApplication.class, args);
+    	}
+}
+```
+
+4. If you want a filter (and see logs), add the following:
+
+```java
+// SimpleFilter.java file
+
+public class SimpleFilter extends ZuulFilter {
+
+    private static Logger log = LoggerFactory.getLogger(SimpleFilter.class);
+
+    @Override
+    public String filterType() {
+        return "pre";
+    }
+
+    @Override
+    public int filterOrder() {
+        return 1;
+    }
+
+    @Override
+    public boolean shouldFilter() {
+        return true;
+    }
+
+    @Override
+    public Object run() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
+
+        log.info(String.format("%s request to %s", request.getMethod(), request.getRequestURL().toString()));
+
+        return null;
+    }
+
+}
+
+// And add a @Bean somwhere. maybe in main?
+
+@Bean
+public SimpleFilter simpleFilter() {
+    return new SimpleFilter();
+}
+```
+
+5. For CORS, you can add WebMvcConfigurer corsConfigurer:
+
+```java
+// mainFile.java
+
+@EnableZuulProxy
+@SpringBootApplication
+public class GatewayServiceExampleApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(GatewayServiceExampleApplication.class, args);
+	}
+
+	@Bean
+	public SimpleFilter simpleFilter() {
+		return new SimpleFilter();
+	}
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**")
+						.allowedOrigins("http://localhost:3000")
+						.allowedMethods("GET", "POST");
+			}
+		};
+	}
+}
+```
+
