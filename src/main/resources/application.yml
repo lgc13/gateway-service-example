@@ -2,15 +2,4 @@ zuul:
   routes:
     dog:
       path: /api/dog/**
-      url: https://dog-spring-service.herokuapp.com/dog
-
-#spring:
-#  cloud:
-#    gateway:
-#      routes:
-#        - id: dog
-#          uri: https://dog-spring-service.herokuapp.com/
-#          predicates:
-#            - Path=/dog/**
-#          filters:
-#            - AddResponseHeader=Access-Control-Allow-Origin, *
+      url: ${DOG_SERVICE_URL}/dog
