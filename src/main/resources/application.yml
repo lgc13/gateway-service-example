@@ -6,6 +6,8 @@ zuul:
       path: /api/dogs/**
       url: ${DOG_SERVICE_URL}/dogs
 
+dog.app.url: ${DOG_APP_SERVER}
+
 
 #spring:
 #  cloud:

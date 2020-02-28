@@ -12,8 +12,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @SpringBootApplication
 public class GatewayServiceExampleApplication {
 
-	@Value("${DOG_APP_SERVER}")
-	private String DOG_APP_SERVER;
+	@Value("${dog.app.url}")
+	private String dogAppUrl;
 
 	public static void main(String[] args) {
 		SpringApplication.run(GatewayServiceExampleApplication.class, args);
@@ -29,7 +29,7 @@ public class GatewayServiceExampleApplication {
 		return new WebMvcConfigurer() {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins(DOG_APP_SERVER)
+						.allowedOrigins(dogAppUrl)
 						.allowedMethods("GET", "POST");
 			}
 		};
