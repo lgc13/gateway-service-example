@@ -1,12 +1,11 @@
 server.port: ${PORT}
+dog.app.url: ${DOG_APP_SERVER}
 
 zuul:
   routes:
     dog:
       path: /api/dogs/**
       url: ${DOG_SERVICE_URL}/dogs
-
-dog.app.url: ${DOG_APP_SERVER}
 
 
 #spring:
