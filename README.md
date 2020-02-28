@@ -198,3 +198,11 @@ spring:
           filters:
             - AddResponseHeader=Access-Control-Allow-Origin, *
 ```
+
+### Spring Security
+
+```groovy
+// add dependency:
+implementation 'org.springframework.boot:spring-boot-starter-security'
+implementation 'org.springframework.security:spring-security-test'
+```
