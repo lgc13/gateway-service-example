@@ -202,7 +202,51 @@ spring:
 ### Spring Security
 
 ```groovy
-// add dependency:
+// add dependencies:
 implementation 'org.springframework.boot:spring-boot-starter-security'
 implementation 'org.springframework.security:spring-security-test'
 ```
+
+- Implement WebSecurityConfigurerAdapter's configure:
+
+```java
+// SecurityConfigurer.java
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
+
+    private final MyUserDetailsService myUserDetailsService;
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(myUserDetailsService);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+}
+```
+
+```java
+// MyUserDetailsService.java
+@Service
+public class MyUserDetailsService implements UserDetailsService {
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return new User("myUsername", "myPassword", List.of());
+    }
+}
+```
+
+- Now if you try to access any endpoints here, it'll require this user. Try it on [localhost:8080](http://localhost:8080) (if you are on that port)
