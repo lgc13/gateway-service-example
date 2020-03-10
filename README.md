@@ -250,3 +250,12 @@ public class MyUserDetailsService implements UserDetailsService {
 ```
 
 - Now if you try to access any endpoints here, it'll require this user. Try it on [localhost:8080](http://localhost:8080) (if you are on that port)
+
+#### JWT tokens
+
+```groovy
+// add dependencies
+compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+```
+
