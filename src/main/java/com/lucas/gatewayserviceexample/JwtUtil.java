@@ -30,8 +30,8 @@ public class JwtUtil {
         return claims.getExpiration();
     }
 
-    public Boolean checkIfTokenIsValid(String token, UserDetails userDetails) {
-        final String username = getUsername(token);
+    public Boolean isTokenValid(String token, UserDetails userDetails) {
+        String username = getUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 

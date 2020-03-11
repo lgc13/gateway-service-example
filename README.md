@@ -237,6 +237,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 }
 ```
 
+- Implement UserDetailsService
+
 ```java
 // MyUserDetailsService.java
 @Service
@@ -244,7 +246,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new User("myUsername", "myPassword", List.of());
+        return new User("myUsername", "myPassword", List.of());  // here you could get your actual users from DB
     }
 }
 ```
@@ -253,9 +255,168 @@ public class MyUserDetailsService implements UserDetailsService {
 
 #### JWT tokens
 
+##### Using this [video example](https://www.youtube.com/watch?v=X80nJ5T7YpE&t=575s)
+
 ```groovy
 // add dependencies
 compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 ```
+
+- Create a JwtUtil
+
+```java
+// JwtUtil.java
+
+@Component
+public class JwtUtil {
+    private String SECRET_KEY = "my secret key";
+
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, userDetails.getUsername());
+    }
+
+    public String getUsername(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.getSubject();
+    }
+
+    public Date getExpirationDate(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.getExpiration();
+    }
+
+    public Boolean isTokenValid(String token, UserDetails userDetails) {
+        String username = getUsername(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    private String createToken(Map<String, Object> claims, String subject) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    private Boolean isTokenExpired(String token) {
+        return getExpirationDate(token).before(new Date());
+    }
+}
+```
+
+- Extend OncePerRequestFilter
+
+```java
+// JwtRequestFilter.java
+
+@Component
+@RequiredArgsConstructor
+public class JwtRequestFilter extends OncePerRequestFilter {
+
+    private final MyUserDetailsService myUserDetailsService;
+    private final JwtUtil jwtUtil;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String authorizationHeader = request.getHeader("Authorization");
+        String username = null;
+        String jwtToken = null;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwtToken = authorizationHeader.substring(7);
+            username = jwtUtil.getUsername(jwtToken);
+        }
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
+            if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+- Add JwtRequestFilter to the SecurityConfigurer
+
+```java
+// SecurityConfigurer.java
+
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
+
+    // ...
+    private final JwtRequestFilter jwtRequestFilter;
+
+    // ...
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+                .authorizeRequests().antMatchers("/authenticate").permitAll()
+                .anyRequest().authenticated()
+                .and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
+}
+```
+
+- Created endpoint to authenticate
+
+```java
+// TestController.java
+
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+public class TestController {
+
+    private final AuthenticationManager authenticationManager;
+    private final MyUserDetailsService myUserDetailsService;
+    private final JwtUtil jwtUtil;
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<String> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    authenticationRequest.getUsername(),
+                    authenticationRequest.getPassword()
+            ));
+            log.info("User authenticated with username: {}", authenticationRequest.getUsername());
+            UserDetails userDetails = myUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+            return ResponseEntity.ok(jwtUtil.generateToken(userDetails));
+        } catch (BadCredentialsException e) {
+            log.error("Bad credentials for user: {}", authenticationRequest.getUsername());
+            return ResponseEntity.status(403).body("Invalid username or password");
+        }
+    }
+}
+```
+
+##### Using Zuul
+ 
+ - [article](https://www.baeldung.com/spring-security-zuul-oauth-jwt)
+ 
+ 
 
