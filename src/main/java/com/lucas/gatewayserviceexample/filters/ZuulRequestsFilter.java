@@ -1,15 +1,13 @@
-package com.lucas.gatewayserviceexample;
+package com.lucas.gatewayserviceexample.filters;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class SimpleFilter extends ZuulFilter {
-
-    private static Logger log = LoggerFactory.getLogger(SimpleFilter.class);
+@Slf4j
+public class ZuulRequestsFilter extends ZuulFilter {
 
     @Override
     public String filterType() {
@@ -35,5 +33,4 @@ public class SimpleFilter extends ZuulFilter {
 
         return null;
     }
-
 }

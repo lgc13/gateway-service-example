@@ -1,4 +1,4 @@
-package com.lucas.gatewayserviceexample;
+package com.lucas.gatewayserviceexample.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

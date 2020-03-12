@@ -413,10 +413,6 @@ public class TestController {
     }
 }
 ```
-
-##### Using Zuul
- 
- - [article](https://www.baeldung.com/spring-security-zuul-oauth-jwt)
  
  
 

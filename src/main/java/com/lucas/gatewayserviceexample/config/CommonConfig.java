@@ -1,11 +1,9 @@
-package com.lucas.gatewayserviceexample;
+package com.lucas.gatewayserviceexample.config;
 
+import com.lucas.gatewayserviceexample.filters.ZuulRequestsFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -14,11 +12,6 @@ public class CommonConfig {
 
     @Value("${dog.app.url}")
     private String dogAppUrl;
-
-    @Bean
-    public SimpleFilter simpleFilter() {
-        return new SimpleFilter();
-    }
 
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
@@ -30,5 +23,10 @@ public class CommonConfig {
                         .allowedMethods("GET", "POST");
             }
         };
+    }
+
+    @Bean
+    public ZuulRequestsFilter simpleFilter() {
+        return new ZuulRequestsFilter();
     }
 }

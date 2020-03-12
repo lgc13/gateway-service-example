@@ -1,5 +1,7 @@
-package com.lucas.gatewayserviceexample;
+package com.lucas.gatewayserviceexample.security;
 
+import com.lucas.gatewayserviceexample.services.MyUserDetailsService;
+import com.lucas.gatewayserviceexample.filters.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;

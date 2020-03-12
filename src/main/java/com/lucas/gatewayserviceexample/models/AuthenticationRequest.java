@@ -1,4 +1,4 @@
-package com.lucas.gatewayserviceexample;
+package com.lucas.gatewayserviceexample.models;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

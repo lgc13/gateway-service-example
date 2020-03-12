@@ -1,4 +1,4 @@
-package com.lucas.gatewayserviceexample;
+package com.lucas.gatewayserviceexample.services;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +13,6 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new User("myUsername", "myPassword", List.of());
+        return new User("user1", "somePass", List.of());
     }
 }
