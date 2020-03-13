@@ -8,13 +8,9 @@ zuul:
       url: ${DOG_SERVICE_URL}/dogs
 
 
-#spring:
-#  cloud:
-#    gateway:
-#      routes:
-#        - id: dogService
-#          uri: http://localhost:8081/
-#          predicates:
-#            - Path=/api/dog/**
-#          filters:
-#            - AddResponseHeader=Access-Control-Allow-Origin, *
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+  jpa:
+    properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect # The SQL dialect makes Hibernate generate better SQL for the chosen database
+    hibernate.ddl-auto: update # Hibernate ddl auto (create, create-drop, validate, update)

@@ -1,6 +1,8 @@
 package com.lucas.gatewayserviceexample.controllers;
 
+import com.lucas.gatewayserviceexample.entity.User;
 import com.lucas.gatewayserviceexample.models.AuthenticationRequest;
+import com.lucas.gatewayserviceexample.repository.UsersRepository;
 import com.lucas.gatewayserviceexample.security.JwtUtil;
 import com.lucas.gatewayserviceexample.services.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
